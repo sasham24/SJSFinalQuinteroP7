@@ -11,7 +11,7 @@ public class FinishLine : MonoBehaviour
         {
             FindObjectOfType<RaceManager>().Player1CompletedLap();
         }
-        else if (other.CompareTag("Player2"))
+        if (other.CompareTag("Player2"))
         {
             FindObjectOfType<RaceManager>().Player2CompletedLap();
         }
