@@ -6,15 +6,44 @@ using UnityEngine.UI;
 public class ChargingStation : MonoBehaviour
 {
     public float chargeRate = 0.5f;
-    public GameObject car1;
-    public GameObject car2;
+    private List<GameObject> carsInStation = new List<GameObject>();
 
-    void OnTriggerStay(Collider other)
+    void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject == car1 || other.gameObject == car2)
+        if (other.CompareTag("Player1") || other.CompareTag("Player2"))
         {
-            //Increase the cars battery level while in the charging station
-            other.GetComponent<Car>().RechargeBattery(chargeRate * Time.deltaTime);
+            carsInStation.Add(other.gameObject);
+            Debug.Log("Car entered charging station");
+        }
+    }
+    void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("Player1") || other.CompareTag("Player2"))
+        {
+            carsInStation.Remove(other.gameObject);
+            Debug.Log("Car exited charging station");
+        }
+    }
+    void Update()
+    {
+      foreach (GameObject car in carsInStation)
+        {
+            ChargeCar(car);
+        }     
+    }
+    void ChargeCar(GameObject car)
+    {
+        Car carScript = car.GetComponent<Car>();
+        if (carScript != null)
+        {
+            carScript.currentBatteryLevel += chargeRate * Time.deltaTime;
+            carScript.currentBatteryLevel = Mathf.Clamp(carScript.currentBatteryLevel, 0f, 100f);
+        }
+        Car2 car2Script = car.GetComponent<Car2>();
+        if (car2Script != null)
+        {
+            car2Script.currentBatteryLevel += chargeRate * Time.deltaTime;
+            car2Script.currentBatteryLevel = Mathf.Clamp(car2Script.currentBatteryLevel, 0f, 100f);
         }
     }
 }

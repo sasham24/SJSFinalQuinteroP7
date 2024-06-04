@@ -5,6 +5,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.SceneManagement;
+using UnityEngine.Android;
+using Unity.VisualScripting.Antlr3.Runtime;
 
 public class RaceManager : MonoBehaviour
 {
@@ -19,12 +21,14 @@ public class RaceManager : MonoBehaviour
 
     
     public TextMeshProUGUI gameOverText;
+   
     public Button restartButton; 
 
     private int player1Laps = 0;
     private int player2Laps = 0;
     private float player1Time = 0f;
     private float player2Time = 0f;
+    
 
     private bool player1Racing = true;
     private bool player2Racing = true;
@@ -36,11 +40,16 @@ public class RaceManager : MonoBehaviour
     private float player2Battery = 100f;
     public float batteryDrainRate = 10f; // Drain rate per second
 
+    public GameObject pauseScreen;
+    public bool paused;
+   
+
     void Start()
     {
-        isGameActive = true;
+        
     }
-    private void Update()
+    
+    void Update()
     {
         if (player1Racing) 
         {
@@ -61,7 +70,10 @@ public class RaceManager : MonoBehaviour
             GameOver();
         }
         
-        
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            ChangePaused();
+        }
     }
     public void Player1CompletedLap()
     {
@@ -72,6 +84,10 @@ public class RaceManager : MonoBehaviour
         if (player1Laps >= 3 && !gameEnded && player2Laps >= 3)
         {
             GameOver();
+        }
+        else if(player1Laps >= 3)
+        {
+            player1Racing = false;
         }
     }
     public void Player2CompletedLap()
@@ -84,7 +100,12 @@ public class RaceManager : MonoBehaviour
         {
             GameOver();
         }
+        else if(player2Laps >= 3)
+        {
+            player2Racing = false;
+        }
     }
+
     private void RechargeBattery(int player)
     {
         if (player == 1)
@@ -109,8 +130,10 @@ public class RaceManager : MonoBehaviour
     }
     public void GameOver()
     {
+        gameEnded = true;
         player1Racing = false;
         player2Racing = false;
+
         gameOverText.gameObject.SetActive(true);
         restartButton.gameObject.SetActive(true);
 
@@ -129,7 +152,28 @@ public class RaceManager : MonoBehaviour
     }
     public void RestartGame()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        Scene currentScene = SceneManager.GetActiveScene();
+        SceneManager.LoadScene(currentScene.name);
+    }
+    public void StartGame()
+    {
+        isGameActive = true;
+
+    }
+    void ChangePaused()
+    {
+        if (!paused)
+        {
+            paused = true;
+            pauseScreen.SetActive(true);
+            Time.timeScale = 0;
+        }
+        else
+        {
+            paused = false;
+            pauseScreen.SetActive(false);
+            Time.timeScale = 0;
+        }
     }
 
 }
